@@ -15,8 +15,9 @@ Author URI: https://github.com/jcamenisch
 
 class Widgetcoder {
   public function __construct($name, $arguments) {
-    $this->name = $name;
+    $this->name      = $name;
     $this->arguments = is_array($arguments[0]) ? $arguments[0] : array();
+    $this->content  = $arguments[1];
   }
 
   public static $shortcode_dir, $shortcode_url, $short_code_runner;
@@ -114,6 +115,7 @@ class Widgetcoder {
 
       extract($this->template_locals());
       extract($this->before_render());
+      $content = $this->content;
 
       require (self::$shortcode_dir . $this->template());
     } catch (Widgetcoder_RenderingException $e) {
