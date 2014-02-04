@@ -23,21 +23,29 @@ class Widgetcoder {
   public static $shortcode_dir, $shortcode_url, $short_code_runner;
 
   public static function init() {
-    self::$shortcode_dir     = ABSPATH . '/shortcodes/';
-    self::$shortcode_url     = site_url() . '/shortcodes/';
-    self::$short_code_runner = new Widgetcoder_Runner;
+    if (is_dir(ABSPATH . '/shortcodes/')) {
+      self::$shortcode_dir = ABSPATH . '/shortcodes/';
+      self::$shortcode_url = site_url() . '/shortcodes/';
+    } elseif (is_dir(get_template_directory() . '/shortcodes/')) {
+      self::$shortcode_dir = get_template_directory() . '/shortcodes/';
+      self::$shortcode_url = get_template_directory_uri() . '/shortcodes/';
+    }
 
-     /**
-     * For every .phtml file in the shortcode directory, add a shortcode that runs
-     * Widgetcoder::[filename without the extension].
-     *
-     * When the shortcode is called, the Widgetcoder::__callStatic function will be run
-     * with the name of the shortcode, and any attributes.
-     */
-    foreach (scandir(self::$shortcode_dir) as $shortcode_file) {
-      if (preg_match("/(.+)\.phtml/", $shortcode_file, $matches)) {
-        $shortcode_name = $matches[1];
-        add_shortcode($shortcode_name, array(self::$short_code_runner, $shortcode_name));
+    if (self::$shortcode_dir) {
+      self::$short_code_runner = new Widgetcoder_Runner;
+
+       /**
+       * For every .phtml file in the shortcode directory, add a shortcode that runs
+       * Widgetcoder::[filename without the extension].
+       *
+       * When the shortcode is called, the Widgetcoder::__callStatic function will be run
+       * with the name of the shortcode, and any attributes.
+       */
+      foreach (scandir(self::$shortcode_dir) as $shortcode_file) {
+        if (preg_match("/(.+)\.phtml/", $shortcode_file, $matches)) {
+          $shortcode_name = $matches[1];
+          add_shortcode($shortcode_name, array(self::$short_code_runner, $shortcode_name));
+        }
       }
     }
   }
